@@ -6,16 +6,20 @@ chrome.storage.sync.get({
 	refresh_interval:1000
 }, function(items) {
 	setTimeout(function() { 
-		if(window.location.pathname == "/store/cart") { 
+		if(window.location.pathname == "/store/cart") {
+			console.log('The device is available.');
 			jQuery('#hardware-checkout').click();
-			document.getElementById("result").insertAdjacentHTML("beforeEnd", JSON.stringify(res, null, 4) + "\n");
+			//document.getElementById("result").insertAdjacentHTML("beforeEnd", JSON.stringify(res, null, 4) + "\n");
 			chrome.storage.sync.get({
 				api_key: '',
 				devices:[]
 			}, function(items) {
 				PushBullet.APIKey = items.api_key;
+				console.log('Pushing to ' + items.devices.length + ' devices');
+
 				$.each(items.devices, function(index, device_iden){
-					PushBullet.push("link", device_iden, null, {title: "I got you a Nexus 6", url: currenturl});
+					console.log('Pushing to device ' + index +': ' + device_iden);
+					PushBullet.push("link", device_iden, null, {title: "Device available!", url: currenturl});
 				});
 			});
 		} else {
@@ -23,7 +27,6 @@ chrome.storage.sync.get({
 		}
 	}, items.refresh_interval);
 });
-
 
 function send_pushes()
 {
