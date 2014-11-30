@@ -54,7 +54,7 @@ function load_devices(saved_devices, removeInvalidIds)
 						$("<div>").append(
 							$("<input>").attr("type", "checkbox").addClass("devices").attr("id",device.iden).val(device.iden).prop('checked', saved_devices.indexOf(device.iden) !== -1)
 						).append(
-							$("<label>").attr("for",device.iden).append(device.nickname + ' (' + device.type + ')')
+							$("<label>").attr("for",device.iden).append('<strong>' + device.nickname + '</strong> <small>(' + device.model + ')</small>')
 						)
 					);
 				});
