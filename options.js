@@ -10,19 +10,22 @@ function checked_devices() {
 }
 
 $(function() {
-	chrome.storage.sync.get({
-		api_key: '',
-		devices:[],
-		refresh_interval:1000
-	}, function(items) {
-		$("#api_key").val(items.api_key);
-		$("#refresh_interval").val(items.refresh_interval);
-		PushBullet.APIKey = items.api_key;
+	chrome.storage.sync.get(
+		{
+			api_key: '',
+			devices: [],
+			refresh_interval: 1000
+		},
+		function(items) {
+			$("#api_key").val(items.api_key);
+			$("#refresh_interval").val(items.refresh_interval);
+			PushBullet.APIKey = items.api_key;
 
-		console.log('Loaded ' + items.devices.length + ' saved devices.');
+			console.log('Loaded ' + items.devices.length + ' saved devices.');
 
-		load_devices(items.devices, true);
-	})
+			load_devices(items.devices, true);
+		}
+	);
 });
 
 function load_devices(saved_devices, removeInvalidIds)
@@ -42,8 +45,7 @@ function load_devices(saved_devices, removeInvalidIds)
 			if (non_chrome_devices.length > 0) {
 				non_chrome_devices.sort(sortByDeviceNickname);
 
-				$.each(non_chrome_devices, function(index, device)
-				{
+				$.each(non_chrome_devices, function(index, device) {
 					if (device.kind === 'chrome') {
 						return;
 					}
@@ -119,7 +121,7 @@ $("#save").click(function(e) {
 	load_devices(devices, false);
 });
 
-$("#test").click(function(e){
+$("#test").click(function(e) {
 	$.each(checked_devices(), function(index, device_iden) {
 		PushBullet.push("link", device_iden, null, {title: "I got you a Nexus 6", url: "https://www.google.com/"});
 	});
