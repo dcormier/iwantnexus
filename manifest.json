@@ -1,7 +1,7 @@
 {
   "name": "I want nexus",
   "description": "I want nexus",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "content_scripts": [
     {
         "matches": ["https://play.google.com/store/devices/*"],
