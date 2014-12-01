@@ -30,15 +30,31 @@ $(function() {
 
 function load_devices(saved_devices, removeInvalidIds)
 {	
+
 	$("#devices").empty().append(
-		$("<div>").append("<small>To avoid a neverending loop, Chrome devices are not included.</small>")
+		$("<div>").append($("<small>").append("Loading devices from PushBullet..."))
 	);
 
 	PushBullet.devices(function(err, res) {
 		if(err) {
-			throw err;
+			if (!err.error) {
+				msg = err.response;
+			}
+			else {
+				msg = err.error.message;
+			}
+
+			$("#devices").empty().append(
+				$("<div>").append($("<small>").append("There was a problem. This might help: " + msg))
+			);
+
+			throw err.httpStatus + ' ' + msg;
 		}
 		else {
+			$("#devices").empty().append(
+				$("<div>").append($("<small>").append("To avoid a neverending loop, Chrome devices are not included."))
+			);
+
 			active_devices = res.devices.filter(filterOutInactiveDevices);
 			non_chrome_devices = active_devices.filter(filterOutChromeDevices);
 			
@@ -54,7 +70,7 @@ function load_devices(saved_devices, removeInvalidIds)
 						$("<div>").append(
 							$("<input>").attr("type", "checkbox").addClass("devices").attr("id",device.iden).val(device.iden).prop('checked', saved_devices.indexOf(device.iden) !== -1)
 						).append(
-							$("<label>").attr("for",device.iden).append('<strong>' + device.nickname + '</strong> <small>(' + device.model + ')</small>')
+							$("<label>").attr("for",device.iden).append($('<strong>').append(device.nickname)).append('&nbsp;').append($('<small>').append('(' + device.model + ')'))
 						)
 					);
 				});
