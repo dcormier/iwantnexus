@@ -1,7 +1,7 @@
 function checked_devices() {
 	devices = [];
-	$(".devices").filter(':checked').each(function(index, element) {
-		devices.push($(element).val());
+	$('#devices .device > :checkbox').filter(':checked').each(function(index, device) {
+		devices.push($(device).val());
 	});
 	
 	console.log(devices.length + ' devices checked');
@@ -30,9 +30,10 @@ $(function() {
 
 function load_devices(saved_devices, removeInvalidIds)
 {	
+	var div_devices = $("#devices");
 
-	$("#devices").empty().append(
-		$("<div>").append($("<small>").append("Loading devices from PushBullet..."))
+	div_devices.empty().append(
+		$("<div>").addClass("loading").append($("<small>").append("Loading devices from PushBullet..."))
 	);
 
 	PushBullet.devices(function(err, res) {
@@ -44,43 +45,51 @@ function load_devices(saved_devices, removeInvalidIds)
 				msg = err.error.message;
 			}
 
-			$("#devices").empty().append(
-				$("<div>").append($("<small>").append("There was a problem. This might help: " + msg))
+			div_devices.empty().append(
+				$("<div>").addClass("failure").append($("<small>").append("There was a problem. This might help: " + msg))
 			);
 
 			throw err.httpStatus + ' ' + msg;
 		}
 		else {
-			$("#devices").empty().append(
-				$("<div>").append($("<small>").append("To avoid a neverending loop, Chrome devices are not included."))
-			);
-
+			div_devices.empty();
 			active_devices = res.devices.filter(filterOutInactiveDevices);
-			non_chrome_devices = active_devices.filter(filterOutChromeDevices);
 			
-			if (non_chrome_devices.length > 0) {
-				non_chrome_devices.sort(sortByDeviceNickname);
+			if (active_devices.length > 0) {
+				active_devices.sort(sortByDeviceNickname);
 
-				$.each(non_chrome_devices, function(index, device) {
-					if (device.kind === 'chrome') {
-						return;
+				var div_non_chrome = $("<div>").addClass("non_chrome");
+				var div_chrome = $("<div>").addClass("chrome");
+
+				div_chrome.append(
+					$("<div>").append($("<small>").append("To avoid a neverending loop, only push to the following Chrome devices if you know exactly what you're doing."))
+				);
+
+				$.each(active_devices, function(index, device) {
+					var checeked = saved_devices.indexOf(device.iden) !== -1;
+					var device_node = buildDeviceNode(device, checeked);
+
+					if (isChromeDevice(device)) {
+						div_chrome.append(device_node);
 					}
-
-					$("#devices").append(
-						$("<div>").append(
-							$("<input>").attr("type", "checkbox").addClass("devices").attr("id",device.iden).val(device.iden).prop('checked', saved_devices.indexOf(device.iden) !== -1)
-						).append(
-							$("<label>").attr("for",device.iden).append($('<strong>').append(device.nickname)).append('&nbsp;').append($('<small>').append('(' + device.model + ')'))
-						)
-					);
+					else {
+						div_non_chrome.append(device_node);	
+					}
 				});
-			}
-			else {
-				if (active_devices.length > 0) {
-					$("#devices").append($("<div>").append("<em>Only Chrome devices are registered with PushBullet! Pushing to those will result in an endless loop. You should <a href=\"https://www.pushbullet.com/apps\" target=\"_blank\">add PushBullet to your other devices</a>.</em>"));
+
+				var non_chrome_count = div_non_chrome.find(".device").length;
+				var chrome_count = div_chrome.find(".device").length
+
+				if (non_chrome_count > 0) {
+					div_devices.append(div_non_chrome);
+
+					if (chrome_count > 0) {
+						div_devices.append("<br />");
+					}
 				}
-				else {
-					$("#devices").append($("<div>").append("<em>No devices registered with PushBullet! You should <a href=\"https://www.pushbullet.com/apps\" target=\"_blank\">fix that</a>.</em>"));
+
+				if (chrome_count > 0) {
+					div_devices.append(div_chrome);
 				}
 			}
 
@@ -96,18 +105,24 @@ function load_devices(saved_devices, removeInvalidIds)
 	});
 }
 
-function filterOutChromeDevices(device) {
-	var isChrome = device.kind === 'chrome';
+function buildDeviceNode(device, checked) {
+	var div_device = $("<div>").addClass("device").append(
+		$("<input>").attr("type", "checkbox").attr("id",device.iden).val(device.iden).prop('checked', checked)
+	).append(
+		$("<label>").attr("for", device.iden).append($('<strong>').append(device.nickname)).append('&nbsp;').append($('<small>').append('(' + device.model + ')'))
+	)
 
-	if (isChrome) {
-		console.log('Skipping Chrome device "' + device.nickname + '" (' + device.iden + ')');
-	}
-
-	return !isChrome;
+	return div_device;
 }
 
 function filterOutInactiveDevices(device) {
 	return device.active;
+}
+
+function isChromeDevice(device) {
+	var isChrome = device && device.kind === 'chrome';
+
+	return isChrome;
 }
 
 function sortByDeviceNickname(a, b) {
