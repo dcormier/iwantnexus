@@ -1,10 +1,13 @@
 {
   "name": "I want nexus",
   "description": "I want nexus",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "content_scripts": [
     {
-        "matches": ["https://play.google.com/store/devices/details/*"],
+        "matches": [
+          "https://play.google.com/store/devices/details/*",
+          "https://play.google.com/store/devices/details?*"
+        ],
         "js": ["jquery.min.js","pushbullet.js","iwantnexus.js"]
     }
   ],
