@@ -37,6 +37,8 @@ function load_devices(saved_devices, removeInvalidIds)
 	);
 
 	PushBullet.devices(function(err, res) {
+		div_devices.empty();
+
 		if(err) {
 			if (!err.error) {
 				msg = err.response;
@@ -45,14 +47,13 @@ function load_devices(saved_devices, removeInvalidIds)
 				msg = err.error.message;
 			}
 
-			div_devices.empty().append(
-				$("<div>").addClass("failure").append($("<small>").append("There was a problem. This might help: " + msg))
+			div_devices.append(
+				$("<div>").addClass("error").append($("<small>").append("There was a problem loading devices from PushBullet. This might help: " + msg))
 			);
 
 			throw err.httpStatus + ' ' + msg;
 		}
 		else {
-			div_devices.empty();
 			active_devices = res.devices.filter(filterOutInactiveDevices);
 			
 			if (active_devices.length > 0) {
