@@ -5,20 +5,20 @@ $(function() {
 	if (add_to_cart.is(':enabled')) {
 		add_to_cart.click();
 
+		console.log('The device is available. Loading API key and devices to push to.');
+
 		chrome.storage.sync.get(
 			{
 				api_key: '',
 				devices: []
 			},
 			function(items) {
-				console.log('The device is available.');
-
 				PushBullet.APIKey = items.api_key;
 				console.log('Pushing to ' + items.devices.length + ' devices');
 
 				$.each(items.devices, function(index, device_iden) {
 					console.log('Pushing to device ' + index + ': ' + device_iden);
-					PushBullet.push("link", device_iden, null, { title: "Device available!", url: deviceurl });
+					PushBullet.push("link", device_iden, null, { title: "Device available - " + document.title, url: deviceurl });
 				});
 
 				$('#hardware-checkout').click();
