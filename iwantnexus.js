@@ -1,5 +1,6 @@
 $(function() {
-	var deviceurl = window.location.href;
+	var device_url = window.location.href;
+	var device_title = document.title;
 	var add_to_cart = $('#body-content > div.details-wrapper.devices.id-track-partial-impression.vs-enabled > div.details-info-wrapper > div > div.info-container > div.details-actions > span.buy-button-container > button');
 
 	if (add_to_cart.is(':enabled')) {
@@ -18,7 +19,7 @@ $(function() {
 
 				$.each(items.devices, function(index, device_iden) {
 					console.log('Pushing to device ' + index + ': ' + device_iden);
-					PushBullet.push("link", device_iden, null, { title: "Device available - " + document.title, url: deviceurl });
+					PushBullet.push("link", device_iden, null, { title: "Device available - " + device_title, url: device_url });
 				});
 
 				$('#hardware-checkout').click();
