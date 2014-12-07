@@ -32,6 +32,14 @@ function load_devices(saved_devices, removeInvalidIds)
 {	
 	var div_devices = $("#devices");
 
+	if (!PushBullet.APIKey) {
+		div_devices.empty().append(
+			$("<div>").addClass("loading").append($("<small>").append("Enter your Pushbullet Access Token above and click save to see devices to push notifications to."))
+		);
+		
+		return;
+	}
+
 	div_devices.empty().append(
 		$("<div>").addClass("loading").append($("<small>").append("Loading devices from PushBullet..."))
 	);
