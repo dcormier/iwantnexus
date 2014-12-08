@@ -93,7 +93,7 @@ function load_devices(saved_devices, removeInvalidIds)
 					div_devices.append(div_non_chrome);
 
 					if (chrome_count > 0) {
-						div_devices.append("<br />");
+						div_devices.append("<br>");
 					}
 				}
 
@@ -162,7 +162,12 @@ $("#save").click(function(e) {
 });
 
 $("#test").click(function(e) {
+	var msg = {
+		title: "Test Push",
+		url: "https://play.google.com/store/devices"
+	};
+
 	$.each(checked_devices(), function(index, device_iden) {
-		PushBullet.push("link", device_iden, null, {title: "I got you a Nexus 6", url: "https://www.google.com/"});
+		PushBullet.push("link", device_iden, null, msg);
 	});
 });
